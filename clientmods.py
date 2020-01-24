@@ -10,8 +10,12 @@ class Client():
 
     def __del__(self):
         if self.ping_count > 0: print("Average ping: ", round(((self.ping_sum/self.ping_count)*1000),1), 'ms')
-        self.send_data("close")
-        self.s.close()
+        
+        try:
+            self.send_data("close")
+            self.s.close()
+        except BrokenPipeError:
+            print("Broken pipe, cant send exit packet")
 
     def connect(self):
         self.s.connect(("bobermarcin.pl", constant.PORT))
@@ -24,15 +28,15 @@ class Client():
     def receive_data(self):
         return (self.s.recv(2000)).decode()
 
-    def ping(self):
-        response = os.system("ping -c 1 " + "192.168.0.71")
-        print(response)
-        # time1 = time.time()
-        # self.send_data('ping')
-        # self.receive_data()
-        # self.ping_sum = self.ping_sum + time.time() - time1
-        # self.ping_count = self.ping_count+1 
-        # print('ping: ', round(((time.time() - time1)*1000),1), 'ms')
+    # def ping(self):
+    #     response = os.system("ping -c 1 " + "192.168.0.71")
+    #     print(response)
+    #     # time1 = time.time()
+    #     # self.send_data('ping')
+    #     # self.receive_data()
+    #     # self.ping_sum = self.ping_sum + time.time() - time1
+    #     # self.ping_count = self.ping_count+1 
+    #     # print('ping: ', round(((time.time() - time1)*1000),1), 'ms')
 
 
 
