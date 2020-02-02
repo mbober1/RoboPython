@@ -34,9 +34,7 @@ class Robot():
         return matrix_out
 
 
-
-
-def keyboard_sterring(event):    
+def read_event(event):
     if event.type == pygame.KEYDOWN:
 
         if event.key == 97:
@@ -62,18 +60,20 @@ def keyboard_sterring(event):
     elif event.type == pygame.KEYUP:
         x = 0
         y = 0
-    
+
+    else:
+        global steering
+        x = -int(steering.joy.get_axis(1)*100)
+        y = int(steering.joy.get_axis(0)*100)
+
     matrix = [x, y]
     return matrix
-
-def joystick_sterring(event):
-    print(event) #TODOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
 
 
 async def Link(stream_found_event):
     global stream_url
     connection = Client()
-    steering = Control_device()
+    
     bufor_matrix = [0,0,0,0]
     try:
         connection.connect()
@@ -85,13 +85,6 @@ async def Link(stream_found_event):
                 connection.send_data(bufor_matrix)
             
             await asyncio.sleep(0)
-
-
-            # rt = joy.get_axis(4)
-            # lt = joy.get_axis(5)
-            # x = joy.get_button(1)
-            # l1 = joy.get_button(4)
-            # r1 = joy.get_button(5)
 
     except ConnectionRefusedError:
         print("Server refused the connection")
@@ -125,11 +118,8 @@ async def Player(stream_found_event):
             if event.type == pygame.QUIT:
                 raise Exception()
             
-            elif event.type == pygame.KEYDOWN or event.type == pygame.KEYUP:
-                car.to_matrix(keyboard_sterring(event))
-            
-            elif event.type == pygame.JOYAXISMOTION:
-                print(joystick_sterring(event))
+            elif event.type == pygame.KEYDOWN or event.type == pygame.KEYUP or event.type == pygame.JOYAXISMOTION:
+                car.to_matrix(read_event(event))
 
 
 
@@ -173,18 +163,20 @@ class Window():
 
 async def main():
     pygame.init()
+    
     stream_found_event = asyncio.Event()
     await asyncio.gather(Player(stream_found_event), Link(stream_found_event))
 
 
 car = Robot()
+steering = Control_device()
 
 try:
     loop = asyncio.get_event_loop()
     loop.run_until_complete(main())
 except (KeyboardInterrupt, Exception) as e:
     print(e)
-    # raise(e)
+    raise(e)
     pass
 finally:
     print('Ending program')

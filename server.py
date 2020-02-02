@@ -21,9 +21,7 @@ while True:
             set_engines(server.handle(), left_engine, right_engine)
         except ValueError as message:
             print(message)
-            
+
     GPIO.cleanup()
     break
-
-
 
