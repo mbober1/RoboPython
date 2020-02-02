@@ -57,7 +57,7 @@ class Server:
         data = self.receive_data()
         if data[0] == '[':
             bufor = ast.literal_eval(data)
-            print(bufor)
+            return bufor
             
         elif data == 'ping':
             self.send_data('pong')

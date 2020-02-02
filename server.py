@@ -18,12 +18,10 @@ while True:
     server.wait_to_client()
     while not server.close:
         try:
-            server.handle()
+            set_engines(server.handle(), left_engine, right_engine)
         except ValueError as message:
             print(message)
-
-        set_engines(server.matrix, left_engine, right_engine)
-    
+            
     GPIO.cleanup()
     break
 
