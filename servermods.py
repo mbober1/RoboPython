@@ -78,4 +78,4 @@ class Server:
             print('Got shutdown command')
 
         else:
-            print("Nieznana komenda:", self.data)
+            print("Unkown command:", self.data)

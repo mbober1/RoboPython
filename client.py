@@ -9,37 +9,57 @@ from ping3 import ping
 
 stream_url = None
 
+class Engine:
+    def __init__(self):
+        self.power = 0
+        self.reverse = 0
+    
+    def set(self, power, reverse):
+        self.power = power
+        self.reverse = reverse
 
-def work(event):    
+
+
+def keyboard_sterring(event):    
     if event.type == pygame.KEYDOWN:
+        power = 100
+
         if event.key == 97:
-            print('left KEYDOWN')
+            direction = 270
         
         if event.key == 100:
-            print('right KEYDOWN')
+            direction = 90
         
         if event.key == 119:
-            print('up KEYDOWN')
+            direction = 0
         
         if event.key == 115:
-            print('down KEYDOWN')
+            direction = 180
+
 
     elif event.type == pygame.KEYUP:
+        power = 0
+
         if event.key == 97:
-            print('left KEYUP')
+            direction = 270
         
         if event.key == 100:
-            print('right KEYUP')
+            direction = 90
         
         if event.key == 119:
-            print('up KEYUP')
+            direction = 0
         
         if event.key == 115:
-            print('down KEYUP')
-        
+            direction = 180
+    
+    matrix = [power, direction]
+    return matrix
+
+def joystick_sterring(event):
+    print(event) #TODOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
 
 
-async def Control(stream_found_event):
+async def Link(stream_found_event):
     global stream_url
     connection = Client()
     steering = Control_device()
@@ -110,8 +130,12 @@ async def Player(stream_found_event):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 raise Exception()
-
-            else: work(event)
+            
+            elif event.type == pygame.KEYDOWN or event.type == pygame.KEYUP:
+                print(keyboard_sterring(event))
+            
+            elif event.type == pygame.JOYAXISMOTION:
+                print(joystick_sterring(event))
 
 
 
@@ -154,9 +178,11 @@ class Window():
 
 
 async def main():
+    left_engine = Engine()
+    right_engine = Engine()
     pygame.init()
     stream_found_event = asyncio.Event()
-    await asyncio.gather(Player(stream_found_event), Control(stream_found_event))
+    await asyncio.gather(Player(stream_found_event), Link(stream_found_event))
 
 
 try:
