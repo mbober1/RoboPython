@@ -24,7 +24,7 @@ class Client():
     def send_data(self, data=''):
         str_data = str(data)
         self.s.sendall(str_data.encode())
-        print(str_data)
+        # print(str_data)
 
     def receive_data(self):
         return (self.s.recv(2000)).decode()

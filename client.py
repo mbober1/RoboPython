@@ -42,26 +42,42 @@ def read_event(event):
         if event.key == 97:
             y = 0
             x = -100
+            matrix = [x, y]
+            car.to_matrix(matrix)
             # direction = 270
         
-        if event.key == 100:
+        elif event.key == 100:
             y = 0
             x = 100
+            matrix = [x, y]
+            car.to_matrix(matrix)
             # direction = 90
         
-        if event.key == 119:
+        elif event.key == 119:
             # direction = 0
             x = 0
             y = 100
+            matrix = [x, y]
+            car.to_matrix(matrix)
         
-        if event.key == 115:
+        elif event.key == 115:
             x = 0
             y = -100
+            matrix = [x, y]
+            car.to_matrix(matrix)
             # direction = 180
+
+        elif event.key == 27:
+            exit()
+
+        else: print(event.key)
 
     elif event.type == pygame.KEYUP:
         x = 0
         y = 0
+
+        matrix = [x, y]
+        car.to_matrix(matrix)
 
     else:
         global steering
@@ -76,8 +92,10 @@ def read_event(event):
         if abs(x) < 10: x = 0
         if abs(y) < 10: y = 0
 
-    matrix = [x, y]
-    return matrix
+        matrix = [x, y]
+        car.to_matrix(matrix)
+
+    
 
 
 async def Link(stream_found_event):
@@ -128,7 +146,7 @@ async def Player(stream_found_event):
                 raise Exception()
             
             elif event.type == pygame.KEYDOWN or event.type == pygame.KEYUP or event.type == pygame.JOYAXISMOTION:
-                car.to_matrix(read_event(event))
+                read_event(event)
 
 
 
@@ -186,8 +204,8 @@ try:
     loop.run_until_complete(main())
 except (KeyboardInterrupt, Exception) as e:
     print(e)
-    # raise(e)
+    raise(e)
     pass
 finally:
-    connection.__del__()
     print('Ending program')
+    connection.__del__()

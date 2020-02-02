@@ -59,13 +59,11 @@ class Server:
         if data[0] == '[':
             bufor = ast.literal_eval(data)
             return bufor
-            
-        elif data == 'ping':
-            self.send_data('pong')
         
         elif data == 'close':
             print('Got shutdown command')
             self.close = True
+            return [0,0,0,0]
 
         else:
             print("Unkown command:", data)
