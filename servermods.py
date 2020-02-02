@@ -20,13 +20,15 @@ class Engine:
         self.pwm_module.stop()
 
     def set(self, new_power, new_direction):
-        self.power = int(new_power*100)
-        self.direction = int(new_direction)
+        self.power = new_power
+        self.direction = new_direction
         self.pwm_module.ChangeDutyCycle(self.power)
         GPIO.output(self.gpio_dir, self.direction)
 
 
-
+def set_engines(matrix, e1, e2):
+    e1.set(matrix[0], matrix[1])
+    e2.set(matrix[2], matrix[3])
 
 class Server:
     def __init__(self):

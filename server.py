@@ -22,8 +22,7 @@ while True:
         except ValueError as message:
             print(message)
 
-        # left_engine.set(server.left_trigger, server.l1)
-        # right_engine.set(server.right_trigger, server.r1)
+        set_engines(server.matrix, left_engine, right_engine)
     
     GPIO.cleanup()
     break
