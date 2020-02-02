@@ -8,5 +8,4 @@ HOST = "bobermarcin.pl"
 PORT = 8080
 
 # LINK = 'http://192.168.0.206:12345/stream.mjpg'
-LINK = 'https://www.radiantmediaplayer.com/media/bbb-360p.mp4'
-FPS = 30
+LINK = 'https://www.radiantmediaplayer.com/media/bbb-360p.mp4' #Big Buck Bunny

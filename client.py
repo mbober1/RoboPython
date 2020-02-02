@@ -120,7 +120,6 @@ async def Control():
     steering = Control_device()
     try:
         # connection.connect()
-        time1 = time.time()
         while True:
             # time.sleep(0.2)
             await asyncio.sleep(0)
@@ -166,6 +165,7 @@ async def Player():
     window = Window()
 
     timer = time.time()
+    fps_set = window.camera.get(5)
     while True:
         await asyncio.sleep(0)
         fps_timer = time.time()
@@ -176,8 +176,8 @@ async def Player():
         window.Play()
         pygame.display.update()
 
-        if (time.time()-fps_timer) < (1/constant.FPS):
-            time.sleep((1/constant.FPS)-(time.time()-fps_timer))
+        if (time.time()-fps_timer) < (1/fps_set):
+            time.sleep((1/fps_set)-(time.time()-fps_timer))
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -191,20 +191,20 @@ class Window():
     def __init__(self):
         pygame.font.init()
         pygame.display.set_caption("RaspiRobot Camera")
-        self.screen = pygame.display.set_mode([640, 480])
+        self.camera = cv2.VideoCapture(constant.LINK)
+        self.screen = pygame.display.set_mode([int(self.camera.get(3)), int(self.camera.get(4))])
         self.screen.fill([0, 0, 0])
         self.font = pygame.font.Font('freesansbold.ttf', 11)
-        self.fps = 0
+        self.displayed_frames = 0
         self.Render_ping()
-        self.camera = cv2.VideoCapture(constant.LINK)
 
     def Render_ping(self):
         temp_ping = ping(constant.HOST, unit='ms', timeout=1)
         self.ping_plane = self.font.render(
             'Ping: ' + str(int(temp_ping)) + 'ms', True, self.white, self.black)
         self.fps_plane = self.font.render(
-            'Fps: ' + str(self.fps), True, self.white, self.black)
-        self.fps = 0
+            'Fps: ' + str(self.displayed_frames), True, self.white, self.black)
+        self.displayed_frames = 0
 
     def Play(self):
         self.ret, self.frame = self.camera.read()
@@ -212,7 +212,8 @@ class Window():
         self.frame = self.frame.swapaxes(0, 1)
         self.frame = pygame.surfarray.make_surface(self.frame)
         self.screen.blit(self.frame, (0, 0))
-        self.fps = self.fps+1
+        self.displayed_frames = self.displayed_frames+1
+        
 
         self.screen.blit(self.ping_plane, (0, 0))
         self.screen.blit(self.fps_plane, (100, 0))
