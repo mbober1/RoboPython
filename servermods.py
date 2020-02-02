@@ -30,6 +30,7 @@ class Engine:
 
 class Server:
     def __init__(self):
+        self.close = False
         self.s = socket()
         self.s.bind((constant.HOST, constant.PORT))
         print("Server start at ", constant.HOST, constant.PORT)
@@ -61,6 +62,7 @@ class Server:
         
         elif data == 'close':
             print('Got shutdown command')
+            self.close = True
 
         else:
             print("Unkown command:", data)

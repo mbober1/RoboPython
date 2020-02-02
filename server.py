@@ -16,7 +16,7 @@ server = Server()
 
 while True:
     server.wait_to_client()
-    while server.data != 'close':
+    while not server.close:
         try:
             server.handle()
         except ValueError as message:
