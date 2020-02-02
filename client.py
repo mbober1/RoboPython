@@ -1,17 +1,11 @@
 import pygame
 import time
-import threading
 import cv2
 from clientmods import *
 import asyncio
-from pygame.locals import *
 from ping3 import ping
 
-import numpy as np
-import sys
-import random
-import time
-import logging
+stream_url = None
 
 
 def FindJoysticks():
@@ -115,11 +109,14 @@ class Control_device():
         #                 self.direction = 90
 
 
-async def Control():
+async def Control(stream_found_event):
+    global stream_url
     connection = Client()
     steering = Control_device()
     try:
         # connection.connect()
+        stream_url = 'Dupa'
+        stream_found_event.set()
         while True:
             # time.sleep(0.2)
             await asyncio.sleep(0)
@@ -160,8 +157,9 @@ async def Control():
         print("Server closed connection")
 
 
-async def Player():
-
+async def Player(stream_found_event):
+    global stream_url
+    await stream_found_event.wait()
     window = Window()
 
     timer = time.time()
@@ -181,7 +179,17 @@ async def Player():
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                sys.exit(2)
+                raise Exception()
+
+            
+            print('E:', event)
+            if event.type == pygame.key.get_pressed():
+                print("wcisniety")
+                if event.key == pygame.K_LEFT:
+                    print("lewo")
+
+                if event.key == pygame.K_RIGHT:
+                    print("prawo")
 
 
 class Window():
@@ -190,7 +198,7 @@ class Window():
 
     def __init__(self):
         pygame.font.init()
-        pygame.display.set_caption("RaspiRobot Camera")
+        pygame.display.set_caption("Robot Camera")
         self.camera = cv2.VideoCapture(constant.LINK)
         self.screen = pygame.display.set_mode([int(self.camera.get(3)), int(self.camera.get(4))])
         self.screen.fill([0, 0, 0])
@@ -214,20 +222,27 @@ class Window():
         self.screen.blit(self.frame, (0, 0))
         self.displayed_frames = self.displayed_frames+1
         
-
         self.screen.blit(self.ping_plane, (0, 0))
         self.screen.blit(self.fps_plane, (100, 0))
 
 
-def main():
-    tasks = None
-    loop = asyncio.get_event_loop()
+
+
+
+
+async def main():
     pygame.init()
+    stream_found_event = asyncio.Event()
+    tasks = None
     try:
-        tasks = asyncio.gather(Player(), Control())
-        loop.run_until_complete(tasks)
-    except KeyboardInterrupt:
-        print('Ending program')
+        tasks = asyncio.gather(Player(stream_found_event), Control(stream_found_event))
+        await tasks
+    except (Exception, KeyboardInterrupt):
+        tasks.cancel()
+        raise KeyboardInterrupt()
 
 
-main()
+try:
+    asyncio.run(main())
+except KeyboardInterrupt:
+    print('Ending program')
