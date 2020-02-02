@@ -109,7 +109,7 @@ class Control_device():
         #                 self.direction = 90
 
 
-
+#dup
 
 async def Control():
     connection = Client()
