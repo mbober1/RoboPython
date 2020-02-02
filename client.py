@@ -2,6 +2,7 @@ import pygame, time, threading, cv2
 from clientmods import *
 import asyncio
 from pygame.locals import *
+from ping3 import ping
 
 import numpy as np
 import sys, random, time
@@ -110,43 +111,47 @@ class Control_device():
 
 
 
-async def main():
-    # client = Client()
+async def Control():
+    connection = Client()
     steering = Control_device()
     try:
-        # client.connect()
+        # connection.connect()
         time1 = time.time()
         while True:
-            # time.sleep(0.2)
-            await asyncio.sleep(0)
-            print(steering.listen())
-            # pygame.event.get()
+            try:
+                # time.sleep(0.2)
+                await asyncio.sleep(0)
+                # print(steering.listen())
+                # pygame.event.get()
 
-            # rt = joy.get_axis(4)
-            # lt = joy.get_axis(5)
-            # x = joy.get_button(1)
-            # l1 = joy.get_button(4)
-            # r1 = joy.get_button(5)
+                # rt = joy.get_axis(4)
+                # lt = joy.get_axis(5)
+                # x = joy.get_button(1)
+                # l1 = joy.get_button(4)
+                # r1 = joy.get_button(5)
 
-            # if left_trigger != lt:
-            #     left_trigger = lt
-            #     client.send_data('LT: ' + str(round((left_trigger + 1) / 2, 2)))
+                # if left_trigger != lt:
+                #     left_trigger = lt
+                #     connection.send_data('LT: ' + str(round((left_trigger + 1) / 2, 2)))
 
-            # if right_trigger != rt:
-            #     right_trigger = rt
-            #     client.send_data('RT: ' + str(round((right_trigger + 1) / 2, 2)))
+                # if right_trigger != rt:
+                #     right_trigger = rt
+                #     connection.send_data('RT: ' + str(round((right_trigger + 1) / 2, 2)))
 
-            # if x:
-            #     print('Abort!')
-            #     exit()
+                # if x:
+                #     print('Abort!')
+                #     exit()
 
-            # if l1!=l1_old:
-            #     l1_old=l1
-            #     client.send_data('l1: ' + str(l1))
+                # if l1!=l1_old:
+                #     l1_old=l1
+                #     connection.send_data('l1: ' + str(l1))
 
-            # if r1 != r1_old:
-            #     r1_old = r1
-            #     client.send_data('r1: ' + str(r1))
+                # if r1 != r1_old:
+                #     r1_old = r1
+                #     connection.send_data('r1: ' + str(r1))
+            except KeyboardInterrupt:
+                print('Control ends')
+                break
 
     except ConnectionRefusedError:
         print("Server refused the connection")
@@ -162,14 +167,6 @@ async def main():
 
 
 
-def Ping():
-    try:
-        time = os.popen("ping -c 1 " + constant.HOST + " | grep time=").readline()
-        return float(time[(time.find('time'))+5:(time.find('ms'))-1])
-    except ValueError:
-        print("cos sie popsulo")
-
-
 
 
 
@@ -177,15 +174,13 @@ async def Player():
     
     window = Window()
 
-    end_program = 0
-    
     timer = time.time()
-    while not end_program:
+    while True:
         await asyncio.sleep(0)
         try:
             fps_timer = time.time()
             if(time.time()- timer > 1):
-                window.Ping()
+                window.Render_ping()
                 timer = time.time()
 
             window.Play()
@@ -215,14 +210,13 @@ class Window():
         self.screen.fill([0,0,0])
         self.font = pygame.font.Font('freesansbold.ttf', 11)
         self.fps = 0
-        self.ping = 0
-        self.Ping()
+        self.Render_ping()
         self.camera = cv2.VideoCapture(constant.LINK)
     
-    def Ping(self):
-        self.ping_plane = self.font.render('Ping: ' + str(Ping()) + 'ms', True, self.white, self.black)
+    def Render_ping(self):
+        temp_ping = ping(constant.HOST, unit='ms', timeout=1)
+        self.ping_plane = self.font.render('Ping: ' + str(int(temp_ping)) + 'ms', True, self.white, self.black)
         self.fps_plane = self.font.render('Fps: ' + str(self.fps), True, self.white, self.black)
-        # print("FPS: " + str(self.fps))
         self.fps=0
 
     def Play(self):
@@ -237,24 +231,13 @@ class Window():
         self.screen.blit(self.fps_plane, (100,0))
         
 
-async def niemain():
-    pygame.init()
-    clock = pygame.time.Clock()
-    clock.tick(60)
+async def main():
+    try:
+        pygame.init()
+        ft = asyncio.gather(Player(), Control())
+        await asyncio.sleep(5)
+        ft.cancel()
+    except asyncio.exceptions.CancelledError:
+        print('dupaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
 
-    await asyncio.gather(Player(), main())
-
-    # threads = []
-    # player_thread = threading.Thread(name='player', target = Player) 
-    # threads.append(player_thread)
-    # player_thread.setDaemon(True)
-
-    # main_thread = threading.Thread(name='main', target = main)
-
-    # player_thread.start()
-    # main_thread.start()
-
-    # player_thread.join()
-    # main_thread.join()
-
-asyncio.run(niemain())
+asyncio.run(main())
