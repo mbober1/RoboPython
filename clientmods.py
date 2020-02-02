@@ -19,13 +19,15 @@ class Client():
 
         
     def connect(self):
-        self.s.connect(("bobermarcin.pl", constant.PORT))
+        self.s.connect((constant.HOST, constant.PORT))
         print('Connected to ', constant.HOST, ':', constant.PORT)
         self.connected = True
         print('Start sending data...')
         
     def send_data(self, data=''):
-        self.s.sendall(data.encode())
+        str_data = str(data)
+        self.s.sendall(str_data.encode())
+        print(str_data)
 
     def receive_data(self):
         return (self.s.recv(2000)).decode()

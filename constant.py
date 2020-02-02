@@ -4,7 +4,7 @@ GPIO_RIGHT_POWER = 16
 GPIO_RIGHT_DIR = 13
 GPIO_DRIVER_POWER = 26 #zasilanie sterownika
 
-HOST = "bobermarcin.pl"
+HOST = "192.168.2.235"
 PORT = 8080
 
 # LINK = 'http://192.168.0.206:12345/stream.mjpg'

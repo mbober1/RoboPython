@@ -17,15 +17,13 @@ server = Server()
 while True:
     server.wait_to_client()
     while server.data != 'close':
-        server.receive_data()
         try:
             server.handle()
         except ValueError as message:
             print(message)
 
-            
-        left_engine.set(server.left_trigger, server.l1)
-        right_engine.set(server.right_trigger, server.r1)
+        # left_engine.set(server.left_trigger, server.l1)
+        # right_engine.set(server.right_trigger, server.r1)
     
     GPIO.cleanup()
     break

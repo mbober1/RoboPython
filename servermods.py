@@ -1,6 +1,7 @@
 import RPi.GPIO as GPIO
 from socket import *
 import constant
+import ast
 
 class Engine:
 
@@ -33,49 +34,33 @@ class Server:
         self.s.bind((constant.HOST, constant.PORT))
         print("Server start at ", constant.HOST, constant.PORT)
         self.s.listen(1)
-        self.data = ''
-        self.left_trigger = 0
-        self.right_trigger = 0
-        self.l1 = 0
-        self.r1 = 0
 
     def __del__(self):
         self.s.close()
         print('Connection closed')
-
 
     def wait_to_client(self):
         self.c, self.addr = self.s.accept()
         print('Got connection from', self.addr)
 
     def receive_data(self):
-        self.data = (self.c.recv(2000)).decode()
+        data = (self.c.recv(2000)).decode()
+        return data
     
     def send_data(self, data=''):
         self.c.send(data.encode())
 
     def handle(self):
-        if self.data[0] == 'L':
-            self.left_trigger = float(self.data[4:])
-            print('Left Trigger: ', self.left_trigger)
+        data = self.receive_data()
+        if data[0] == '[':
+            bufor = ast.literal_eval(data)
+            print(bufor)
             
-        elif self.data[0] == 'R':
-            self.right_trigger = float(self.data[4:])
-            print('Right Trigger: ', self.right_trigger)
-
-        elif self.data == 'ping':
+        elif data == 'ping':
             self.send_data('pong')
-
-        elif self.data[0] == 'l':
-            self.l1 = float(self.data[4:])
-            print('L1: ', self.l1)
-
-        elif self.data[0] == 'r':
-            self.r1 = float(self.data[4:])
-            print('R1: ', self.r1)
         
-        elif self.data == 'close':
+        elif data == 'close':
             print('Got shutdown command')
 
         else:
-            print("Unkown command:", self.data)
+            print("Unkown command:", data)

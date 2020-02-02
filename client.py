@@ -1,6 +1,7 @@
 import pygame
 import time
 import cv2
+import math
 from clientmods import *
 from control import *
 import asyncio
@@ -9,50 +10,60 @@ from ping3 import ping
 
 stream_url = None
 
-class Engine:
+
+class Robot():
     def __init__(self):
-        self.power = 0
-        self.reverse = 0
-    
-    def set(self, power, reverse):
-        self.power = power
-        self.reverse = reverse
+        self.matrix = [0,0,0,0]
+
+    def to_matrix(self, matrix):
+        y = matrix[1]
+        x = -matrix[0]
+        left_engine = (y-x)
+        right_engine = (y+x)
+
+        r_power = abs(right_engine)
+        l_power = abs(left_engine)
+        if left_engine < 0: l_dir = 1
+        else: l_dir = 0 
+
+        if right_engine < 0: r_dir = 1
+        else: r_dir = 0 
+
+        matrix_out = [l_power, l_dir, r_power, r_dir]
+        self.matrix = matrix_out
+        return matrix_out
+
 
 
 
 def keyboard_sterring(event):    
     if event.type == pygame.KEYDOWN:
-        power = 100
 
         if event.key == 97:
-            direction = 270
+            y = 0
+            x = -100
+            # direction = 270
         
         if event.key == 100:
-            direction = 90
+            y = 0
+            x = 100
+            # direction = 90
         
         if event.key == 119:
-            direction = 0
+            # direction = 0
+            x = 0
+            y = 100
         
         if event.key == 115:
-            direction = 180
-
+            x = 0
+            y = -100
+            # direction = 180
 
     elif event.type == pygame.KEYUP:
-        power = 0
-
-        if event.key == 97:
-            direction = 270
-        
-        if event.key == 100:
-            direction = 90
-        
-        if event.key == 119:
-            direction = 0
-        
-        if event.key == 115:
-            direction = 180
+        x = 0
+        y = 0
     
-    matrix = [power, direction]
+    matrix = [x, y]
     return matrix
 
 def joystick_sterring(event):
@@ -63,41 +74,24 @@ async def Link(stream_found_event):
     global stream_url
     connection = Client()
     steering = Control_device()
+    bufor_matrix = [0,0,0,0]
     try:
-        # connection.connect()
+        connection.connect()
         stream_url = 'Dupa'
         stream_found_event.set()
         while True:
-            # time.sleep(0.2)
+            if bufor_matrix != car.matrix:
+                bufor_matrix = car.matrix
+                connection.send_data(bufor_matrix)
+            
             await asyncio.sleep(0)
-            # print(steering.listen())
-            # pygame.event.get()
+
 
             # rt = joy.get_axis(4)
             # lt = joy.get_axis(5)
             # x = joy.get_button(1)
             # l1 = joy.get_button(4)
             # r1 = joy.get_button(5)
-
-            # if left_trigger != lt:
-            #     left_trigger = lt
-            #     connection.send_data('LT: ' + str(round((left_trigger + 1) / 2, 2)))
-
-            # if right_trigger != rt:
-            #     right_trigger = rt
-            #     connection.send_data('RT: ' + str(round((right_trigger + 1) / 2, 2)))
-
-            # if x:
-            #     print('Abort!')
-            #     exit()
-
-            # if l1!=l1_old:
-            #     l1_old=l1
-            #     connection.send_data('l1: ' + str(l1))
-
-            # if r1 != r1_old:
-            #     r1_old = r1
-            #     connection.send_data('r1: ' + str(r1))
 
     except ConnectionRefusedError:
         print("Server refused the connection")
@@ -132,7 +126,7 @@ async def Player(stream_found_event):
                 raise Exception()
             
             elif event.type == pygame.KEYDOWN or event.type == pygame.KEYUP:
-                print(keyboard_sterring(event))
+                car.to_matrix(keyboard_sterring(event))
             
             elif event.type == pygame.JOYAXISMOTION:
                 print(joystick_sterring(event))
@@ -178,18 +172,19 @@ class Window():
 
 
 async def main():
-    left_engine = Engine()
-    right_engine = Engine()
     pygame.init()
     stream_found_event = asyncio.Event()
     await asyncio.gather(Player(stream_found_event), Link(stream_found_event))
 
+
+car = Robot()
 
 try:
     loop = asyncio.get_event_loop()
     loop.run_until_complete(main())
 except (KeyboardInterrupt, Exception) as e:
     print(e)
+    # raise(e)
     pass
 finally:
     print('Ending program')
