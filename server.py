@@ -1,5 +1,5 @@
 from socket import *
-import time, constant
+import constant
 import RPi.GPIO as GPIO
 from servermods import *
 

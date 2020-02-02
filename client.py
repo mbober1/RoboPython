@@ -1,19 +1,17 @@
 import pygame
 import time
 import cv2
-import math
 from clientmods import *
 from control import *
 import asyncio
 from ping3 import ping
-
 
 stream_url = None
 
 
 class Robot():
     def __init__(self):
-        self.matrix = [0,0,0,0]
+        self.matrix = [0,0,0,0]        
 
     def to_matrix(self, matrix):
         y = matrix[1]
@@ -23,6 +21,10 @@ class Robot():
 
         r_power = abs(right_engine)
         l_power = abs(left_engine)
+
+        if r_power > 100: r_power = 100
+        if l_power > 100: l_power = 100
+
         if left_engine < 0: l_dir = 1
         else: l_dir = 0 
 
@@ -66,13 +68,20 @@ def read_event(event):
         x = -int(steering.joy.get_axis(1)*100)
         y = int(steering.joy.get_axis(0)*100)
 
+        if x > 100: x = 100
+        if x < -100: x = -100
+        if y > 100: y = 100
+        if y < -100: y = -100
+
+        if abs(x) < 10: x = 0
+        if abs(y) < 10: y = 0
+
     matrix = [x, y]
     return matrix
 
 
 async def Link(stream_found_event):
     global stream_url
-    connection = Client()
     
     bufor_matrix = [0,0,0,0]
     try:
@@ -170,13 +179,15 @@ async def main():
 
 car = Robot()
 steering = Control_device()
+connection = Client()
 
 try:
     loop = asyncio.get_event_loop()
     loop.run_until_complete(main())
 except (KeyboardInterrupt, Exception) as e:
     print(e)
-    raise(e)
+    # raise(e)
     pass
 finally:
+    connection.__del__()
     print('Ending program')
