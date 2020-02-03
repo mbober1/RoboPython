@@ -27,7 +27,7 @@ class Engine:
 
 
 def set_engines(matrix, e1, e2):
-    print(matrix)
+    print(matrix) #DEBUG
     e1.set_engine(matrix[0], matrix[1])
     e2.set_engine(matrix[2], matrix[3])
 
@@ -56,10 +56,10 @@ class Server:
 
     def handle(self):
         data = self.receive_data()
-        print('Recived: ', data)
+        # print('Recived: ', data) #DEBUG
         if data[0] == '[':
             bufor = ast.literal_eval(data)
-            print('Transformated to: ', bufor)
+            # print('Transformated to: ', bufor) #DEBUG
             return bufor
         
         elif data == 'close':

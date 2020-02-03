@@ -13,9 +13,9 @@ class Client():
 
     def __del__(self):
         if self.connected: 
-                self.send_data("close")
-                self.s.close()
-                print("Connection closed")
+            self.send_data("close")
+            self.s.close()
+            print("Connection closed")
 
         
     def connect(self):
@@ -89,7 +89,7 @@ def to_matrix(matrix):
     else: r_dir = 0 
 
     matrix_out = [l_power, l_dir, r_power, r_dir]
-    print('Matrix out: ', matrix_out)
+    # print('Matrix out: ', matrix_out) #DEBUG
     return matrix_out
 
 
@@ -136,7 +136,7 @@ def read_event(event):
         if abs(y) < 10: y = 0
 
     matrix = [x, y]
-    print('X: ', matrix[0], ' Y: ', matrix[1])
+    # print('X: ', matrix[0], ' Y: ', matrix[1]) #DEBUG
     return matrix
 
    

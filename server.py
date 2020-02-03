@@ -9,14 +9,13 @@ GPIO.setwarnings(False)
 GPIO.setup(constant.GPIO_DRIVER_POWER, GPIO.OUT) #zasilanie sterownika
 GPIO.output(constant.GPIO_DRIVER_POWER, GPIO.HIGH)
 
-left_engine = Engine(constant.GPIO_LEFT_POWER,constant.GPIO_LEFT_DIR)
-right_engine = Engine(constant.GPIO_RIGHT_POWER,constant.GPIO_RIGHT_DIR)
-
-server = Server()
 
 while True:
+    server = Server()
     try:
         server.wait_to_client()
+        left_engine = Engine(constant.GPIO_LEFT_POWER,constant.GPIO_LEFT_DIR)
+        right_engine = Engine(constant.GPIO_RIGHT_POWER,constant.GPIO_RIGHT_DIR)
         while not server.close:
             try:
                 set_engines(server.handle(), left_engine, right_engine)

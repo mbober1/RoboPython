@@ -11,7 +11,7 @@ async def Link(stream_found_event):
     global stream_url
     global matrix
     
-    bufor_matrix = [0,0,0,0]
+    bufor_matrix = matrix
     try:
         connection.connect()
         stream_url = 'Dupa'
