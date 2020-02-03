@@ -9,22 +9,20 @@ GPIO.setwarnings(False)
 GPIO.setup(constant.GPIO_DRIVER_POWER, GPIO.OUT) #zasilanie sterownika
 GPIO.output(constant.GPIO_DRIVER_POWER, GPIO.HIGH)
 
-
+server = Server()
 while True:
     try:
-        server = Server()
         server.wait_to_client()
         left_engine = Engine(constant.GPIO_LEFT_POWER,constant.GPIO_LEFT_DIR)
         right_engine = Engine(constant.GPIO_RIGHT_POWER,constant.GPIO_RIGHT_DIR)
         while not server.close:
             try:
                 set_engines(server.handle(), left_engine, right_engine)
-            except ValueError as message:
-                print(message)
+            except ValueError as error:
+                print(error)
         print('Connection closed')
     except KeyboardInterrupt:
         break
-
 
 print('Ending program')
 GPIO.cleanup()
