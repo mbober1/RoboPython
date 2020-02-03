@@ -35,7 +35,7 @@ class Server:
     def __init__(self):
         self.close = False
         self.s = socket()
-        self.s.bind(constant.HOST, constant.PORT)
+        self.s.bind((constant.HOST, constant.PORT))
         print("Server start at ", constant.HOST, constant.PORT)
         self.s.listen(1)
 
