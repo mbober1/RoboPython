@@ -15,13 +15,17 @@ right_engine = Engine(constant.GPIO_RIGHT_POWER,constant.GPIO_RIGHT_DIR)
 server = Server()
 
 while True:
-    server.wait_to_client()
-    while not server.close:
-        try:
-            set_engines(server.handle(), left_engine, right_engine)
-        except ValueError as message:
-            print(message)
+    try:
+        server.wait_to_client()
+        while not server.close:
+            try:
+                set_engines(server.handle(), left_engine, right_engine)
+            except ValueError as message:
+                print(message)
+        print('Connection closed')
+    except KeyboardInterrupt:
+        break
 
-    GPIO.cleanup()
-    break
 
+print('Ending program')
+GPIO.cleanup()

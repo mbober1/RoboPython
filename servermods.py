@@ -56,8 +56,10 @@ class Server:
 
     def handle(self):
         data = self.receive_data()
+        print('Recived: ', data)
         if data[0] == '[':
             bufor = ast.literal_eval(data)
+            print('Transformated to: ', bufor)
             return bufor
         
         elif data == 'close':
