@@ -11,8 +11,8 @@ GPIO.output(constant.GPIO_DRIVER_POWER, GPIO.HIGH)
 
 
 while True:
-    server = Server()
     try:
+        server = Server()
         server.wait_to_client()
         left_engine = Engine(constant.GPIO_LEFT_POWER,constant.GPIO_LEFT_DIR)
         right_engine = Engine(constant.GPIO_RIGHT_POWER,constant.GPIO_RIGHT_DIR)
